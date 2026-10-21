@@ -120,9 +120,12 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .cform label,.cform legend{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;padding:0}
 .cform label i{font-style:normal;text-transform:none;letter-spacing:0}
 .cform fieldset{border:0;margin:0;padding:0;min-width:0}
-.cform input[type=text],.cform input[type=time],.cform textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+.cform input[type=text],.cform input[type=time],.cform textarea{display:block;width:100%;min-width:0;max-width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:0;padding:10px 12px}
+.cform input[type=time]{-webkit-appearance:none;appearance:none;min-height:46px;text-align:left}
+.cform input[type=time]::-webkit-date-and-time-value{text-align:left}
 .cform textarea{min-height:84px;resize:vertical}
-.cform .times{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cform .times{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.cform .times > div{min-width:0}
 .cform .days{display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid var(--line)}
 .cform .days label{margin:0;text-transform:none;letter-spacing:0;color:var(--ink);font-family:var(--display);font-size:15px;font-weight:700;text-align:center;padding:9px 0;border-left:1.5px solid var(--line);cursor:pointer}
 .cform .days label:first-child{border-left:0}
@@ -689,8 +692,8 @@ function bindCustomForm(form, id, done){
     ev.preventDefault();
     const f = new FormData(form), v = k => String(f.get(k)||"").trim();
     const c = {id: id || "custom-"+Date.now().toString(36), day:v("day"), s:v("s"), e:v("e"), title:v("title"), loc:v("loc"), desc:v("desc")};
-    const missing = [!c.day&&"a day", !c.s&&"a start time", !c.e&&"an end time", !c.title&&"a title"].filter(Boolean);
-    if (missing.length) { form.querySelector(".err").textContent = "Please add " + missing.join(", ").replace(/, ([^,]*)$/, " and $1") + "."; return; }
+    const missing = [!c.day&&"day", !c.s&&"start", !c.e&&"end", !c.title&&"title"].filter(Boolean);
+    if (missing.length) { form.querySelector(".err").textContent = "Missing: " + missing.join(", "); return; }
     saveCustom(c);
     if (!id) state.picks.add(c.id);
     save(); render(); done();
