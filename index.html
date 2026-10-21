@@ -76,8 +76,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .pick::before{content:"";position:absolute;inset:-8px}
 /* Events that have already ended */
 .card.past,.tl .ev.past{opacity:.6}
-.pick:disabled{cursor:default}
-.btn-pick:disabled{cursor:default;opacity:.6}
+.pick:disabled,.card.on .pick:disabled{cursor:default;background:var(--muted);border-color:var(--muted);color:var(--bg)}
+.btn-pick:disabled,.btn-pick.on:disabled{cursor:default;background:var(--chip);border-color:var(--dim);color:var(--muted)}
 .clash{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:0 5px;border-radius:999px;background:var(--theatre);color:var(--on-venue)}
 
 /* To-scale mode */
@@ -463,6 +463,12 @@ const state = {
 };
 for (const id of state.picks) if (!EVENTS.some(e => e.id===id)) state.picks.delete(id);
 for (const e of EVENTS) if (e.fixed) state.picks.add(e.id);
+// Recommended picks: added once per visitor, removable like any other pick
+const DEFAULT_PICKS = ["/talks/lauren-lundholm-talk-kikk2026"];
+const seeded = new Set(store.get("kikk.seeded", []));
+for (const id of DEFAULT_PICKS) if (!seeded.has(id)) { state.picks.add(id); seeded.add(id); }
+store.set("kikk.seeded", [...seeded]);
+store.set("kikk.picks", [...state.picks]);
 const save = () => { store.set("kikk.picks",[...state.picks]); store.set("kikk.view",state.view); store.set("kikk.scale",state.scale); };
 
 const $ = id => document.getElementById(id);
@@ -655,6 +661,17 @@ $("s-blocks").onclick = () => { state.scale="blocks"; save(); render(); };
 $("s-scale").onclick = () => { state.scale="scale"; save(); render(); };
 render();
 setInterval(render, 60000);
+
+// On load during the festival, jump to today's first event that hasn't ended yet (or the now line in To scale)
+function scrollToNow(){
+  const today = DAYS.find(d => { const m = nowOn(d.id); return m >= 0 && m < 1440; });
+  const sec = today && $("d-"+today.id); if (!sec) return;
+  const target = state.scale==="scale" ? sec.querySelector(".now") : sec.querySelector(".card:not(.past)")?.closest(".slot");
+  if (!target) return;
+  scrollTo(0, target.getBoundingClientRect().top + scrollY - $("hdr").offsetHeight - (state.scale==="scale" ? 80 : 8));
+}
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+document.fonts.ready.then(() => requestAnimationFrame(scrollToNow));
 
 // Favicon: white K on black, drawn in the display font once it has loaded (the SVG in <head> is the fallback)
 document.fonts.load('800 54px "Bricolage Grotesque"', "K").then(faces => {
