@@ -262,8 +262,80 @@ const RAW = {
 ["PARTY","20:00","","Sarah Davachi — Live Organ Concert","KIKK × MUTEK","Église Saint-Loup","/parties/kikk-orgues-party-kikk2026"]
 ]};
 
-// Event images by path (from kikkfestival.be). Events without an entry render without an image.
+// Event images by path: file in the festival's Supabase gallery (image_url on kikkfestival.be). Events without an entry render without an image.
+const IMG_BASE = "https://himwmqovpohyivdytgkh.supabase.co/storage/v1/render/image/public/gallery/";
 const IMAGES = {
+"/panels/artist-talk-sound-systems-and-who-controls-them-panel-kikk2026":"media-library/1791448583004-zvan9tuqwu.png",
+"/panels/beyond-stereo-the-rise-of-immersive-sound-panel-kikk2026":"media-library/1791562002757-xz5gz7t1mr.avif",
+"/panels/building-spaces-of-inspiration-and-experimentation-for-creative-professionals-panel-kikk2026":"media-library/1792050686460-pl8h325qm3.jpeg",
+"/panels/cineuro-film-lab-unlocking-opportunities-across-europecs-film-creative-industries-panel-kikk2026":"media-library/1792057016074-gtvoxlk3cof.jpeg",
+"/panels/coding-heritage-panel-kikk2026":"media-library/1791449169524-2b7m4vusfnm.jpg",
+"/panels/creatifs-et-devs-decoder-la-collaboration-creative-panel-kikk2026":"media-library/1792054308470-ddeed159ut5.jpeg",
+"/panels/creative-industries-business-as-unusual-panel-kikk2026-2":"media-library/1792051421832-3hwc3feof0y.jpeg",
+"/panels/curating-under-constraint-panel-kikk2026":"cropped/e9e34079-2b46-4e1d-b276-094a6f5bb9c8.jpg",
+"/panels/echoes-from-below-panel-kikk2026":"media-library/1791558597098-64u6d9n66rt.png",
+"/panels/ecosysteme-creatif-immersif-europeen-mythe-ou-realite-panel-kikk2026":"media-library/1792055632095-yr0ybv1psw.jpeg",
+"/panels/fokus-immersive-dance-meets-vr-and-ar-panel-kikk2026":"media-library/1792055193070-3r9e6i8tzse.jpg",
+"/panels/from-event-to-experience-panel-kikk2026":"media-library/1791399126089-maesm4r09ci.jpg",
+"/panels/from-experiment-to-ecosystem-where-creativity-research-innovation-technology-meet-panel-kikk2026":"cropped/fe2dccb9-1ef8-47d0-98af-d7a36112652c.jpg",
+"/panels/hidrotopias-living-with-changing-waters-art-communities-ecological-adaptation-panel-kikk2026":"media-library/1792061273294-ivlszy6hl1h.jpg",
+"/panels/making-it-real-panel-kikk2026":"media-library/1791449067724-85krfbt6b6l.webp",
+"/panels/play-testing-digital-transformation-panel-kikk2026-1":"media-library/1791896413397-7u4l5ew4vih.jpg",
+"/panels/reimagine-reinventing-the-city-panel-kikk2026":"media-library/1791448904218-ev2g8lbuai5.jpg",
+"/panels/senses-and-sensibility-when-immersion-looks-beyond-vision-presented-by-xn-quebec-panel-kikk2026":"media-library/1791528723962-h7ud1i9svr.jpg",
+"/panels/ubv-pitch-panel-kikk2026":"media-library/1792057945595-kija8vqgkd.jpeg",
+"/panels/water-resonances-listening-translating-advocating-panel-kikk2026":"media-library/1791557011514-krgwtk0yjhm.png",
+"/parties/fri-23-oct-17-30-20-00-afterwork-x-azo-party-kikk2026":"media-library/1792496210900-1ktyai1dbrb.jpg",
+"/parties/kikk-after-party-party-kikk2026":"media-library/1788798925640-8l230j7e5cf.png",
+"/parties/kikk-opening-party-party-kikk2026":"media-library/1788341268617-kjkibjuoei.jpg",
+"/parties/kikk-orgues-party-kikk2026":"media-library/1788425986755-eyp4gj7hysb.jpg",
+"/parties/thu-22-oct-17-30-20-30-afterwork-x-larson-party-kikk2026":"media-library/1792495060267-5dqlozoi59.jpg",
+"/talks/adriano-esteves-talk-kikk2026":"media-library/1790720058557-gmc5vnru3e8.png",
+"/talks/andrew-hill-talk-kikk2026":"cropped/37a2eb32-9000-48a4-a473-78069202868d.jpg",
+"/talks/aqua-ductus-water-traces-talk-kikk2026":"media-library/1791826616756-vwppv7sve7.jpeg",
+"/talks/building-worlds-for-the-sphere-talk-kikk2026":"cropped/3ddd7e90-4f30-492b-9f9e-9cd2ceae3691.jpg",
+"/talks/catherine-turp-talk-kikk2026":"cropped/2b59bdec-e6a2-4093-8892-703ebc3e10af.jpg",
+"/talks/danielle-brathwaite-shirley-talk-kikk2026":"cropped/523ddab8-bb40-4119-9d13-0524fcbd8ea7.jpg",
+"/talks/david-sheldon-hicks-talk-kikk2026":"cropped/95e0c811-ea94-4a5b-85b9-94420d86fc90.jpg",
+"/talks/dries-depoorter-talk-kikk2026":"cropped/7472c069-4e8b-4ea2-af4c-15bd51b91090.jpg",
+"/talks/fish-string-theory-a-fish-that-sings-at-sunset-in-the-mediterranean-sea-talk-kikk2026":"media-library/1791828185516-vliu7kc3go.jpg",
+"/talks/from-pixel-to-material-talk-kikk2026":"media-library/1790726452762-bjfe7snod8j.png",
+"/talks/gavin-strange-talk-kikk2026":"cropped/568612db-8652-4173-a524-1f0dc3986960.jpg",
+"/talks/gwenael-frannois-talk-kikk2026":"cropped/fcf3f4ea-0949-464e-890e-72a06c6b41e7.jpg",
+"/talks/haque-tan-talk-kikk2026":"media-library/1777904182128-gfafhqv2d1.png",
+"/talks/henry-daubrez-talk-kikk2026":"media-library/1790711756969-e71xxv6xgq7.jpg",
+"/talks/in-the-mind-of-the-whale-talk-kikk2026":"media-library/1791819284824-z4g3819armc.jpg",
+"/talks/itns-not-you-itns-us-understanding-client-personas-and-how-to-work-with-them-talk-kikk2026":"cropped/01f69981-94a0-4c1c-90f3-ae6ce66879b8.jpg",
+"/talks/klasien-van-de-zandschulp-talk-kikk2026":"media-library/1791448665138-kugrbvgp5sb.jpg",
+"/talks/lauren-lundholm-talk-kikk2026":"cropped/847fc140-8009-4bdf-9cf9-afe204f296c6.jpg",
+"/talks/lauren-moffatt-talk-kikk2026":"media-library/1785163586574-mqapgefkmx.jpeg",
+"/talks/leonardo-giusti-talk-kikk2026":"media-library/1790723787203-9jzgip1vyz.jpg",
+"/talks/loulou-joao-talk-kikk2026":"cropped/06093f4f-37aa-46c3-b32c-360a5d5a88c9.jpg",
+"/talks/lukas-bentel-talk-kikk2026":"cropped/9a64b166-13e2-4118-a735-2a85db5a62e4.jpg",
+"/talks/marina-otero-verzier-talk-kikk2026":"cropped/f0225566-b23e-4c24-97d9-b101b18e6ab3.jpg",
+"/talks/marina-willer-talk-kikk2026":"cropped/34b84733-468d-4434-a311-d0afee9c94be.jpg",
+"/talks/mario-klingemann-talk-kikk2026":"cropped/0360475f-b277-443c-9779-c7c2d644c0bf.jpg",
+"/talks/melanie-courtinat-talk-kikk2026":"cropped/e21bd25e-6674-4140-8f65-726f4f10ec39.jpg",
+"/talks/memo-akten-katie-hofstadter-talk-kikk2026":"cropped/a376e33d-0c3b-4878-9270-aadeefd4dce6.jpg",
+"/talks/memo-akten-solo-talk-talk-kikk2026":"media-library/1790780309610-tkwbqg2rrvf.jpg",
+"/talks/moritz-stefaner-talk-kikk2026":"media-library/1777903969195-4l2aiehg0lq.png",
+"/talks/pierre-alain-giraud-talk-kikk2026":"cropped/c02f2392-f2a7-473a-8717-a9c4b1052662.jpg",
+"/talks/pj-richardson-laundry-talk-kikk2026":"cropped/cace42f4-766b-4876-9624-ea6227d40146.jpg",
+"/talks/ponpon-mania-blending-storytelling-illustration-and-creative-coding-talk-kikk2026":"cropped/7fe05bc7-2b21-4a0a-abd1-279ff35d417f.jpg",
+"/talks/salt-mouth-expanded-archive-talk-kikk2026":"media-library/1792060566638-y1hf0dnp3e.jpg",
+"/talks/she-argonaut-curiosity-and-invention-beneath-the-surface-talk-kikk2026":"media-library/1791816480294-x2zxarwvcof.jpg",
+"/talks/soulwax-2manydjs-talk-kikk2026":"media-library/1789376531332-t9ppcwwo0mn.jpg",
+"/talks/sounds-fishy-unexpected-discoveries-from-the-frontiers-of-underwater-signal-exploration-talk-kikk2026":"media-library/1791817778068-wxvw6g6rufs.png",
+"/talks/special-projects-talk-kikk2026":"cropped/595c5ce3-c122-4b74-a388-ee22c7a66379.jpg",
+"/talks/stephen-onreilly-talk-kikk2026":"media-library/1791539626997-ijhks73auy.jpg",
+"/talks/the-rain-paths-talk-kikk2026":"media-library/1791826946084-qkaxmtzw29.jpg",
+"/talks/tim-rodenbroker-talk-kikk2026":"media-library/1788264417564-wv63vtqf80k.jpg",
+"/talks/type-to-image-talk-kikk2026":"media-library/1790956124215-opfsexwyqx.jpeg",
+"/talks/valerio-spoletini-encor-studio-talk-kikk2026":"cropped/bb31baad-9b0c-49a4-a552-2bd504f02976.jpg",
+"/talks/vera-van-de-seyp-talk-kikk2026":"media-library/1781095289904-lqf7sc71w0g.jpeg",
+"/talks/victor-verhelst-talk-kikk2026":"cropped/9946552a-e258-443e-87fe-8c71888d67b0.jpg",
+"/talks/video-games-in-dialogue-with-ancestral-knowledge-from-ritual-to-interactive-music-talk-kikk2026":"cropped/d67cf201-0d6b-45f2-a7b1-fea8587ac665.jpg",
+"/talks/what-does-it-mean-to-be-creative-today-talk-kikk2026":"cropped/55c152bd-723b-4e7c-bca8-3c3bb6057da5.jpg"
 };
 
 const toMin = s => { const [h,m] = s.split(":").map(Number); return h*60+m; };
@@ -329,7 +401,7 @@ function blocks(list, clash){
     <div class="slot"><div class="t">${fmt(t)}</div><div class="cards">${evs.map(e => {
       const on = state.picks.has(e.id);
       return `<div class="card ${on?"on":""} ${e.img?"has-img":""}" style="--v:var(${VENUES[e.venue].c})" data-id="${esc(e.id)}" role="button" tabindex="0">
-        ${e.img ? `<img class="thumb" src="${esc(e.img)}" alt="" loading="lazy">` : ""}
+        ${e.img ? `<img class="thumb" src="${esc(IMG_BASE+e.img+"?width=160&height=160&resize=cover&quality=70")}" alt="" loading="lazy">` : ""}
         <div class="when"><i></i>${fmt(e.start)}–${e.noEnd?"?":fmt(e.end)} · ${esc(e.tag)}${clash.has(e.id)?'<span class="clash">clash</span>':""}</div>
         <div class="ttl">${esc(e.sub && e.tag!=="PARTY" && e.title.length<40 && !/·/.test(e.title) ? e.title+" — "+e.sub : e.title)}</div>
         <div class="where">${esc(e.loc)}</div>
@@ -410,7 +482,7 @@ function openSheet(id){
   const subParts = e.sub ? e.sub.split(" | ") : [];
   $("sheetRoot").innerHTML = `<div class="scrim" id="scrim"></div>
   <div class="sheet ${e.img?"has-img":""}" role="dialog" aria-modal="true" aria-label="${esc(e.title)}" style="--v:var(${VENUES[e.venue].c})">
-    ${e.img ? `<img class="hero-img" src="${esc(e.img)}" alt="">` : ""}<div class="inner">
+    ${e.img ? `<img class="hero-img" src="${esc(IMG_BASE+e.img+"?width=960&quality=72&resize=contain")}" alt="">` : ""}<div class="inner">
     <span class="tag">${esc(e.tag)}</span>
     <h3>${esc(e.title)}</h3>
     ${subParts.map(p=>`<div class="sub">${esc(p)}</div>`).join("")}
