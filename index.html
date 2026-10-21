@@ -35,6 +35,10 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .seg{display:flex;border:1.5px solid var(--line);border-radius:999px;padding:2px;flex:1 1 160px;min-width:0}
 .seg button{flex:1 1 auto;border:0;background:transparent;border-radius:999px;padding:7px 6px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);white-space:nowrap;letter-spacing:-.01em}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg-view{flex:1 1 240px}
+.seg-scale{flex:none}
+.seg-scale button{width:48px;flex:none;display:grid;place-items:center}
+.seg-scale svg{width:20px;height:18px;display:block}
 .count{font-family:var(--mono);font-size:11px;font-weight:500;margin-left:5px}
 .daynav{display:grid;grid-template-columns:repeat(3,1fr);margin-top:10px;border:1.5px solid var(--line)}
 .daynav button{border:0;border-left:1.5px solid var(--line);background:transparent;padding:6px 0 4px;cursor:pointer;color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em}
@@ -69,6 +73,9 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
   border:1.5px solid var(--ink);background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;color:var(--ink)}
 .card.on .pick{border-color:var(--bg);background:var(--bg);color:var(--ink)}
 .pick svg{width:14px;height:14px}
+.pick::before{content:"";position:absolute;inset:-8px}
+/* Events that have already ended */
+.card.past,.tl .ev.past{opacity:.6}
 .pick:disabled{cursor:default}
 .btn-pick:disabled{cursor:default;opacity:.6}
 .clash{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:0 5px;border-radius:999px;background:var(--theatre);color:var(--on-venue)}
@@ -149,13 +156,13 @@ footer a{color:inherit}
   </div>
   <header id="hdr">
     <div class="controls">
-      <div class="seg" role="group" aria-label="Which events">
+      <div class="seg seg-view" role="group" aria-label="Which events">
         <button id="v-all" aria-pressed="true">Full agenda</button>
         <button id="v-mine" aria-pressed="false">My picks<span class="count" id="cnt">0</span></button>
       </div>
-      <div class="seg" role="group" aria-label="Time scale">
-        <button id="s-blocks" aria-pressed="true">Blocks</button>
-        <button id="s-scale" aria-pressed="false">To scale</button>
+      <div class="seg seg-scale" role="group" aria-label="Time scale">
+        <button id="s-blocks" aria-pressed="true" aria-label="Blocks" title="Blocks"><svg viewBox="0 0 246 218" fill="currentColor" aria-hidden="true"><rect y="0" width="246" height="54"/><rect y="82" width="246" height="54"/><rect y="164" width="246" height="54"/></svg></button>
+        <button id="s-scale" aria-pressed="false" aria-label="To scale" title="To scale"><svg viewBox="0 0 246 218" fill="currentColor" aria-hidden="true"><rect y="0" width="246" height="27"/><rect y="55" width="246" height="81"/><rect y="164" width="246" height="54"/></svg></button>
       </div>
     </div>
     <div class="daynav" id="daynav"></div>
@@ -482,7 +489,7 @@ function blocks(list, clash){
   return `<div class="list">` + [...bySlot.entries()].map(([t, evs]) => `
     <div class="slot"><div class="t">${fmt(t)}</div><div class="cards">${evs.map(e => {
       const on = state.picks.has(e.id);
-      return `<div class="card ${on?"on":""} ${e.img?"has-img":""}" style="--v:var(${VENUES[e.venue].c})" data-id="${esc(e.id)}" role="button" tabindex="0">
+      return `<div class="card ${on?"on":""} ${e.img?"has-img":""} ${isPast(e)?"past":""}" style="--v:var(${VENUES[e.venue].c})" data-id="${esc(e.id)}" role="button" tabindex="0">
         ${e.img ? `<img class="thumb" src="${esc(IMG_BASE+e.img+"?width=160&height=160&resize=cover&quality=70")}" alt="" loading="lazy">` : ""}
         <div class="when"><i></i>${fmt(e.start)}–${e.noEnd?"?":fmt(e.end)} · ${esc(e.tag)}${clash.has(e.id)?'<span class="clash">clash</span>':""}</div>
         <div class="ttl">${esc(e.sub && e.tag!=="PARTY" && e.title.length<40 && !/·/.test(e.title) ? e.title+" — "+e.sub : e.title)}</div>
@@ -491,6 +498,14 @@ function blocks(list, clash){
           : `<button class="pick" data-pick="${esc(e.id)}" aria-label="${on?"Remove from":"Add to"} my picks">${on?check:plus}</button>`}
       </div>`; }).join("")}</div></div>`).join("") + `</div>`;
 }
+
+// Minutes since midnight of dayId, Brussels time (negative before that day, >1440 after it)
+function nowOn(dayId){
+  const local = new Date(new Date().toLocaleString("en-US",{timeZone:"Europe/Brussels"}));
+  const today = Date.UTC(local.getFullYear(), local.getMonth(), local.getDate());
+  return (today - Date.parse(dayId)) / 864e5 * 1440 + local.getHours()*60 + local.getMinutes();
+}
+const isPast = e => e.end <= nowOn(e.day);
 
 function scaled(list, dayId){
   const t0 = Math.floor(Math.min(...list.map(e=>e.start))/30)*30;
@@ -507,16 +522,12 @@ function scaled(list, dayId){
   for (const e of placed){
     const on = state.picks.has(e.id); const h = (e.end-e.start)*ppm - 2;
     const w = 100/e._n;
-    html += `<button class="ev ${on?"on":""} ${h<34?"tiny":""}" data-id="${esc(e.id)}" style="--v:var(${VENUES[e.venue].c});top:${(e.start-t0)*ppm}px;height:${h}px;left:calc(${w*e._col}% + 1px);width:calc(${w}% - 2px)" aria-label="${esc(e.title)}, ${fmt(e.start)}">
+    html += `<button class="ev ${on?"on":""} ${h<34?"tiny":""} ${isPast(e)?"past":""}" data-id="${esc(e.id)}" style="--v:var(${VENUES[e.venue].c});top:${(e.start-t0)*ppm}px;height:${h}px;left:calc(${w*e._col}% + 1px);width:calc(${w}% - 2px)" aria-label="${esc(e.title)}, ${fmt(e.start)}">
       <div class="when">${fmt(e.start)}–${e.noEnd?"?":fmt(e.end)}</div><div class="ttl">${esc(e.title)}</div></button>`;
   }
   // now line
-  const now = new Date(); const local = new Date(now.toLocaleString("en-US",{timeZone:"Europe/Brussels"}));
-  const ymd = local.getFullYear()+"-"+String(local.getMonth()+1).padStart(2,"0")+"-"+String(local.getDate()).padStart(2,"0");
-  let nm = local.getHours()*60+local.getMinutes();
-  const prev = new Date(local); prev.setDate(prev.getDate()-1);
-  const ymdPrev = prev.getFullYear()+"-"+String(prev.getMonth()+1).padStart(2,"0")+"-"+String(prev.getDate()).padStart(2,"0");
-  if (ymdPrev === dayId && nm + 1440 <= t1) nm += 1440; else if (ymd !== dayId) nm = -1;
+  let nm = nowOn(dayId);
+  if (nm < 0 || nm > 2880) nm = -1;
   if (nm >= t0 && nm <= t1) html += `<div class="now" style="top:${(nm-t0)*ppm}px"><span>now</span></div>`;
   return html + `</div>`;
 }
@@ -643,6 +654,7 @@ $("v-mine").onclick = () => { state.view="mine"; save(); render(); };
 $("s-blocks").onclick = () => { state.scale="blocks"; save(); render(); };
 $("s-scale").onclick = () => { state.scale="scale"; save(); render(); };
 render();
+setInterval(render, 60000);
 
 // Favicon: white K on black, drawn in the display font once it has loaded (the SVG in <head> is the fallback)
 document.fonts.load('800 54px "Bricolage Grotesque"', "K").then(faces => {
