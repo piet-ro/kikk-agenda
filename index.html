@@ -40,7 +40,10 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .seg-scale button{width:48px;flex:none;display:grid;place-items:center}
 .seg-scale svg{width:20px;height:18px;display:block}
 .count{font-family:var(--mono);font-size:11px;font-weight:500;margin-left:5px}
-.daynav{display:grid;grid-template-columns:repeat(3,1fr);margin-top:10px;border:1.5px solid var(--line)}
+.navrow{display:flex;gap:8px;align-items:center;margin-top:10px}
+.daynav{flex:1;display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid var(--line)}
+.addbtn{flex:none;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.addbtn svg{width:18px;height:18px}
 .daynav button{border:0;border-left:1.5px solid var(--line);background:transparent;padding:6px 0 4px;cursor:pointer;color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em}
 .daynav button:first-child{border-left:0}
 .daynav button b{display:block;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.04em;color:var(--ink);line-height:1}
@@ -106,6 +109,29 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .sheet:not(.has-img) .grab{background:var(--dim);box-shadow:none}
 .sheet .desc{margin-top:10px;padding-top:14px;border-top:1.5px solid var(--dim);font-size:15px;line-height:1.45}
 .sheet .desc p{margin:0 0 .8em}
+
+/* Custom event form (add modal + editable sheet) */
+.modal-scrim{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px}
+.modal{background:var(--bg);border:1.5px solid var(--line);border-radius:24px;width:100%;max-width:460px;max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;padding:22px 20px 20px;position:relative}
+.modal h2{margin:0 44px 14px 0;font-size:30px;font-weight:800;letter-spacing:-.045em;line-height:1}
+.modal .close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:var(--chip);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.modal .close svg{width:14px;height:14px}
+.cform{display:flex;flex-direction:column;gap:12px}
+.cform label,.cform legend{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;padding:0}
+.cform label i{font-style:normal;text-transform:none;letter-spacing:0}
+.cform fieldset{border:0;margin:0;padding:0;min-width:0}
+.cform input[type=text],.cform input[type=time],.cform textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
+.cform textarea{min-height:84px;resize:vertical}
+.cform .times{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cform .days{display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid var(--line)}
+.cform .days label{margin:0;text-transform:none;letter-spacing:0;color:var(--ink);font-family:var(--display);font-size:15px;font-weight:700;text-align:center;padding:9px 0;border-left:1.5px solid var(--line);cursor:pointer}
+.cform .days label:first-child{border-left:0}
+.cform .days input{position:absolute;opacity:0;pointer-events:none}
+.cform .days label:has(input:checked){background:var(--ink);color:var(--bg)}
+.cform .days label:has(input:focus-visible){outline:2px solid var(--ink);outline-offset:-4px}
+.cform .submit{margin-top:4px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);padding:14px;font-size:17px;font-weight:800;letter-spacing:-.01em;cursor:pointer}
+.cform .err{color:var(--theatre);font-size:13px;min-height:0}
+.btn-delete{margin-top:14px;align-self:flex-start;border:0;background:transparent;color:var(--theatre);font-weight:700;font-size:14px;padding:6px 0;cursor:pointer;text-decoration:underline}
 .sheet .inner{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 .sheet .tag{align-self:flex-start;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;padding:2px 8px;border-radius:999px;background:var(--v);color:var(--on-venue)}
 .sheet h3{margin:0;font-size:28px;font-weight:800;line-height:1;letter-spacing:-.04em;text-wrap:balance}
@@ -113,7 +139,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .sheet .row{font-family:var(--mono);font-size:12px;color:var(--ink)}
 .sheet .actions{flex:none;display:flex;gap:8px;background:var(--bg);border-top:1.5px solid var(--dim);
   padding:12px max(18px,env(safe-area-inset-left,0px),calc((100% - 560px) / 2)) calc(12px + env(safe-area-inset-bottom,0px))}
-.sheet .actions > *{flex:1;text-align:center;border-radius:999px;padding:12px;font-weight:700;font-size:15px;text-decoration:none;cursor:pointer;border:1.5px solid var(--ink)}
+.sheet .actions > *{flex:1;white-space:nowrap;font-size:clamp(13px,3.8vw,15px);text-align:center;border-radius:999px;padding:12px;font-weight:700;text-decoration:none;cursor:pointer;border:1.5px solid var(--ink)}
 .btn-pick{background:var(--ink);color:var(--bg)}
 .btn-pick.on{background:transparent;color:var(--ink)}
 .btn-link{color:var(--ink)}
@@ -138,7 +164,10 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 @media (min-width:1024px){
   .wrap{max-width:none}
   .daynav{display:none}
-  .controls{max-width:720px}
+  header{display:flex;flex-wrap:wrap;align-items:center;gap:0 8px}
+  .controls{flex:0 1 720px}
+  .navrow{margin-top:0}
+  .legend{flex-basis:100%}
   #main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;align-items:start}
   .sheet{left:50%;right:auto;width:min(640px,100vw);transform:translate(-50%,var(--dy,0px));border:1.5px solid var(--line);border-bottom:0;border-radius:20px 20px 0 0;overflow:hidden}
   .sheet .grab{display:none}
@@ -151,7 +180,7 @@ footer a{color:inherit}
 <div class="wrap" lang="en">
   <div class="hero">
     <h1>KIKK<br>agenda</h1>
-    <div class="where">Namur, 22–25 October 2026</div>
+    <div class="where">Namur, 22–24 October 2026</div>
     <div class="sync">Snapshot <span id="snap"></span> · <a href="https://kikkfestival.be/schedule?day=2026-10-22" target="_blank" rel="noopener">kikkfestival.be/schedule ↗</a></div>
   </div>
   <header id="hdr">
@@ -165,13 +194,17 @@ footer a{color:inherit}
         <button id="s-scale" aria-pressed="false" aria-label="To scale" title="To scale"><svg viewBox="0 0 246 218" fill="currentColor" aria-hidden="true"><rect y="0" width="246" height="27"/><rect y="55" width="246" height="81"/><rect y="164" width="246" height="54"/></svg></button>
       </div>
     </div>
-    <div class="daynav" id="daynav"></div>
+    <div class="navrow">
+      <div class="daynav" id="daynav"></div>
+      <button class="addbtn" id="addEvent" aria-label="Add your own event" title="Add your own event"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 2.5v11M2.5 8h11"/></svg></button>
+    </div>
     <div class="legend" id="legend"></div>
   </header>
   <main id="main"></main>
   <footer>Schedule subject to change on kikkfestival.be. Your picks are saved in this browser only. Saturday currently lists one evening concert; talks run Thursday and Friday.</footer>
 </div>
 <div id="sheetRoot"></div>
+<div id="modalRoot"></div>
 <div class="intro-scrim" id="intro" hidden>
   <div class="intro" role="dialog" aria-modal="true" aria-labelledby="intro-t">
     <h2 id="intro-t">Your personal KIKK agenda planner</h2>
@@ -456,6 +489,28 @@ const store = {
   get(k,f){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; }catch(_){ return f; } },
   set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(_){} }
 };
+// Custom events added by the visitor, kept in this browser
+let CUSTOM = store.get("kikk.custom", []);
+const customEvent = c => {
+  const start = toMin(c.s); let end = toMin(c.e); if (end <= start) end += 1440;
+  return {id:c.id, day:c.day, tag:"MY EVENT", start, end, custom:true, title:c.title, sub:"", loc:c.loc||"", venue:"other", desc:c.desc||"",
+    url: c.loc ? "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(c.loc) : "", urlLabel:"Map ↗"};
+};
+for (const c of CUSTOM) EVENTS.push(customEvent(c));
+function saveCustom(c){
+  const i = CUSTOM.findIndex(x => x.id===c.id);
+  if (i < 0) CUSTOM.push(c); else CUSTOM[i] = c;
+  const j = EVENTS.findIndex(x => x.id===c.id), ev = customEvent(c);
+  if (j < 0) EVENTS.push(ev); else EVENTS[j] = ev;
+  store.set("kikk.custom", CUSTOM);
+}
+function deleteCustom(id){
+  CUSTOM = CUSTOM.filter(x => x.id!==id);
+  const j = EVENTS.findIndex(x => x.id===id); if (j >= 0) EVENTS.splice(j, 1);
+  state.picks.delete(id);
+  store.set("kikk.custom", CUSTOM); save();
+}
+
 const state = {
   picks: new Set(store.get("kikk.picks", [])),
   view: store.get("kikk.view", "all"),
@@ -587,29 +642,78 @@ function openSheet(id){
     <div class="scroll" id="sheetScroll">
       ${e.img ? `<img class="hero-img" src="${esc(IMG_BASE+e.img+"?width=960&quality=72&resize=contain")}" alt="">` : ""}<div class="inner">
       <span class="tag">${esc(e.tag)}</span>
+      ${e.custom ? `${customForm(CUSTOM.find(c=>c.id===id), "Save changes")}<button class="btn-delete" id="sheetDelete">Delete event</button>` : `
       <h3>${esc(e.title)}</h3>
       ${subParts.map(p=>`<div class="sub">${esc(p)}</div>`).join("")}
       <div class="row">${d.dow} ${d.n} Oct · ${fmt(e.start)}–${e.noEnd?"end not listed":fmt(e.end)} · ${e.end-e.start} min${e.noEnd?" (assumed)":""}</div>
       <div class="row">${esc(e.loc)}</div>
-      ${desc ? `<div class="desc">${desc}</div>` : ""}
+      ${desc ? `<div class="desc">${desc}</div>` : ""}`}
     </div></div>
     <div class="actions">
-      <a class="btn-link" href="${esc(e.url)}" target="_blank" rel="noopener">${e.urlLabel || "Event page ↗"}</a>
+      ${e.url ? `<a class="btn-link" href="${esc(e.url)}" target="_blank" rel="noopener">${e.urlLabel || "Event page ↗"}</a>` : ""}
       <button class="btn-pick ${on?"on":""}" id="sheetPick" ${e.fixed?"disabled":""}>${e.fixed?"Fixed in my picks":on?"Remove from my picks":"Add to my picks"}</button>
     </div>
   </div>`;
   $("scrim").onclick = closeSheet;
   $("sheetClose").onclick = closeSheet;
   $("sheetPick").onclick = () => { togglePick(id); closeSheet(); };
+  if (e.custom) {
+    bindCustomForm($("sheet").querySelector("form"), id, () => closeSheet());
+    $("sheetDelete").onclick = () => { if (confirm("Delete this event?")) { deleteCustom(id); closeSheet(); render(); } };
+  }
   dragToClose($("sheet"), $("sheetScroll"));
   syncLock();
   $("sheetPick").focus({preventScroll:true});
 }
 function closeSheet(){ $("sheetRoot").innerHTML = ""; syncLock(); }
 
+// Form shared by the "add event" modal and the sheet of a custom event
+function customForm(c, submitLabel){
+  c = c || {day:"", s:"", e:"", title:"", loc:"", desc:""};
+  return `<form class="cform" novalidate>
+    <fieldset><legend>Day</legend><div class="days">${DAYS.map(d => `<label><input type="radio" name="day" value="${d.id}" required ${c.day===d.id?"checked":""}>${d.dow} ${d.n}</label>`).join("")}</div></fieldset>
+    <div class="times">
+      <div><label for="cf-s">Start</label><input type="time" id="cf-s" name="s" required value="${esc(c.s)}"></div>
+      <div><label for="cf-e">End</label><input type="time" id="cf-e" name="e" required value="${esc(c.e)}"></div>
+    </div>
+    <div><label for="cf-t">Title</label><input type="text" id="cf-t" name="title" required maxlength="120" value="${esc(c.title)}"></div>
+    <div><label for="cf-l">Location <i>(optional)</i></label><input type="text" id="cf-l" name="loc" maxlength="160" value="${esc(c.loc)}" placeholder="Opens in Google Maps"></div>
+    <div><label for="cf-d">Description <i>(optional)</i></label><textarea id="cf-d" name="desc" maxlength="2000">${esc(c.desc)}</textarea></div>
+    <div class="err" role="alert"></div>
+    <button class="submit" type="submit">${submitLabel}</button>
+  </form>`;
+}
+function bindCustomForm(form, id, done){
+  form.oninput = () => { form.querySelector(".err").textContent = ""; };
+  form.onsubmit = ev => {
+    ev.preventDefault();
+    const f = new FormData(form), v = k => String(f.get(k)||"").trim();
+    const c = {id: id || "custom-"+Date.now().toString(36), day:v("day"), s:v("s"), e:v("e"), title:v("title"), loc:v("loc"), desc:v("desc")};
+    const missing = [!c.day&&"a day", !c.s&&"a start time", !c.e&&"an end time", !c.title&&"a title"].filter(Boolean);
+    if (missing.length) { form.querySelector(".err").textContent = "Please add " + missing.join(", ").replace(/, ([^,]*)$/, " and $1") + "."; return; }
+    saveCustom(c);
+    if (!id) state.picks.add(c.id);
+    save(); render(); done();
+  };
+}
+function openAddModal(){
+  $("modalRoot").innerHTML = `<div class="modal-scrim" id="modalScrim"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-t">
+    <h2 id="add-t">Add your own event</h2>
+    <button class="close" id="modalClose" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg></button>
+    ${customForm(null, "DONE")}
+  </div></div>`;
+  $("modalScrim").onclick = ev => { if (ev.target.id==="modalScrim") closeModal(); };
+  $("modalClose").onclick = closeModal;
+  bindCustomForm($("modalRoot").querySelector("form"), null, closeModal);
+  syncLock();
+  $("modalRoot").querySelector('input[name="day"]').focus();
+}
+function closeModal(){ $("modalRoot").innerHTML = ""; syncLock(); }
+$("addEvent").onclick = openAddModal;
+
 // Keep the page behind the intro or an open sheet from scrolling
 function syncLock(){
-  const on = !$("intro").hidden || !!$("sheet");
+  const on = !$("intro").hidden || !!$("sheet") || !!$("modalScrim");
   document.documentElement.style.overflow = on ? "hidden" : "";
 }
 
@@ -617,7 +721,7 @@ function syncLock(){
 function dragToClose(sheet, scroller){
   let y0 = null, t0 = 0, dy = 0;
   sheet.addEventListener("touchstart", ev => {
-    if (ev.target.closest(".actions") || scroller.scrollTop > 0) { y0 = null; return; }
+    if (ev.target.closest(".actions,input,textarea,label,button") || scroller.scrollTop > 0) { y0 = null; return; }
     y0 = ev.touches[0].clientY; t0 = Date.now(); dy = 0;
   }, {passive:true});
   sheet.addEventListener("touchmove", ev => {
@@ -649,7 +753,7 @@ function closeIntro(){
 if (!introSeen()) { $("intro").hidden = false; syncLock(); $("intro-go").focus(); }
 $("intro-go").onclick = closeIntro;
 
-document.addEventListener("keydown", e => { if (e.key==="Escape") { if (!$("intro").hidden) closeIntro(); else closeSheet(); } if ((e.key==="Enter"||e.key===" ") && e.target.classList?.contains("card")) { e.preventDefault(); openSheet(e.target.dataset.id); } });
+document.addEventListener("keydown", e => { if (e.key==="Escape") { if (!$("intro").hidden) closeIntro(); else if ($("modalScrim")) closeModal(); else closeSheet(); } if ((e.key==="Enter"||e.key===" ") && e.target.classList?.contains("card")) { e.preventDefault(); openSheet(e.target.dataset.id); } });
 
 $("main").addEventListener("click", ev => {
   const p = ev.target.closest("[data-pick]"); if (p){ ev.stopPropagation(); togglePick(p.dataset.pick); return; }
