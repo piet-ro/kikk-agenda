@@ -230,21 +230,23 @@ const toMin = s => { const [h,m] = s.split(":").map(Number); return h*60+m; };
 const fmt = m => { m = ((m % 1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); };
 const venueOf = loc => /bourse/i.test(loc) ? "bourse" : /th[ée][âa]tre/i.test(loc) ? "theatre" : /delta/i.test(loc) ? "delta" : "other";
 
+// We only reach Namur on Thu 22 in the afternoon: festival events starting before this are hidden, whatever the source data says.
+const ARRIVAL = {day:"2026-10-22", from:toMin("15:00")};
 const EVENTS = [];
 for (const d of DAYS) for (const r of RAW[d.id]) {
   const [tag,s,e,title,sub,loc,path] = r;
   const start = toMin(s); let end = e ? toMin(e) : start + 60;
   if (end <= start) end += 1440;
+  if (d.id === ARRIVAL.day && start < ARRIVAL.from) continue;
   EVENTS.push({id:path, day:d.id, tag, start, end, noEnd:!e, title, sub, loc, venue:venueOf(loc), url:"https://kikkfestival.be"+path});
 }
-// Group plan: always in My picks, cannot be removed. [id, day, tag, start, title, location]
+// Group plan: always in My picks, cannot be removed. [id, day, tag, start, end, title, location]
 const FIXED = [
-  ["fixed-bus","2026-10-22","TRAVEL","10:30","Gather for bus","Flixbus station Utrecht, in front of the NH hotel"],
-  ["fixed-dinner","2026-10-22","DINNER","19:00","Dinner","Restaurant Balthazar, Namur"]
+  ["fixed-bus","2026-10-22","TRAVEL","10:30","10:45","Gather for bus","Flixbus station Utrecht, in front of the NH hotel"],
+  ["fixed-dinner","2026-10-22","DINNER","19:00","21:00","Dinner","Restaurant Balthazar, Namur"]
 ];
-for (const [id,day,tag,s,title,loc] of FIXED) {
-  const start = toMin(s);
-  EVENTS.push({id, day, tag, start, end:start+60, noEnd:true, fixed:true, title, sub:"", loc, venue:venueOf(loc),
+for (const [id,day,tag,s,e,title,loc] of FIXED) {
+  EVENTS.push({id, day, tag, start:toMin(s), end:toMin(e), fixed:true, title, sub:"", loc, venue:venueOf(loc),
     url:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc), urlLabel:"Map ↗"});
 }
 const isFixed = id => EVENTS.some(e => e.id===id && e.fixed);
@@ -258,6 +260,7 @@ const state = {
   view: store.get("kikk.view", "all"),
   scale: store.get("kikk.scale", "blocks")
 };
+for (const id of state.picks) if (!EVENTS.some(e => e.id===id)) state.picks.delete(id);
 for (const e of EVENTS) if (e.fixed) state.picks.add(e.id);
 const save = () => { store.set("kikk.picks",[...state.picks]); store.set("kikk.view",state.view); store.set("kikk.scale",state.scale); };
 
