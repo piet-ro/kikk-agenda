@@ -39,6 +39,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .daynav button{border:0;border-left:1.5px solid var(--line);background:transparent;padding:6px 0 4px;cursor:pointer;color:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.06em}
 .daynav button:first-child{border-left:0}
 .daynav button b{display:block;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.04em;color:var(--ink);line-height:1}
+.daynav button[aria-current="true"]{background:var(--ink);color:var(--on-ink-muted)}
+.daynav button[aria-current="true"] b{color:var(--bg)}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:12px;color:var(--muted)}
 .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
 
@@ -66,6 +68,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
   border:1.5px solid var(--ink);background:transparent;display:grid;place-items:center;cursor:pointer;padding:0;color:var(--ink)}
 .card.on .pick{border-color:var(--bg);background:var(--bg);color:var(--ink)}
 .pick svg{width:14px;height:14px}
+.pick:disabled{cursor:default}
+.btn-pick:disabled{cursor:default;opacity:.6}
 .clash{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:0 5px;border-radius:999px;background:var(--theatre);color:var(--on-venue)}
 
 /* To-scale mode */
@@ -233,6 +237,17 @@ for (const d of DAYS) for (const r of RAW[d.id]) {
   if (end <= start) end += 1440;
   EVENTS.push({id:path, day:d.id, tag, start, end, noEnd:!e, title, sub, loc, venue:venueOf(loc), url:"https://kikkfestival.be"+path});
 }
+// Group plan: always in My picks, cannot be removed. [id, day, tag, start, title, location]
+const FIXED = [
+  ["fixed-bus","2026-10-22","TRAVEL","10:30","Gather for bus","Flixbus station Utrecht, in front of the NH hotel"],
+  ["fixed-dinner","2026-10-22","DINNER","19:00","Dinner","Restaurant Balthazar, Namur"]
+];
+for (const [id,day,tag,s,title,loc] of FIXED) {
+  const start = toMin(s);
+  EVENTS.push({id, day, tag, start, end:start+60, noEnd:true, fixed:true, title, sub:"", loc, venue:venueOf(loc),
+    url:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc), urlLabel:"Map ↗"});
+}
+const isFixed = id => EVENTS.some(e => e.id===id && e.fixed);
 
 const store = {
   get(k,f){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; }catch(_){ return f; } },
@@ -243,6 +258,7 @@ const state = {
   view: store.get("kikk.view", "all"),
   scale: store.get("kikk.scale", "blocks")
 };
+for (const e of EVENTS) if (e.fixed) state.picks.add(e.id);
 const save = () => { store.set("kikk.picks",[...state.picks]); store.set("kikk.view",state.view); store.set("kikk.scale",state.scale); };
 
 const $ = id => document.getElementById(id);
@@ -273,7 +289,8 @@ function blocks(list, clash){
         <div class="when"><i></i>${fmt(e.start)}–${e.noEnd?"?":fmt(e.end)} · ${esc(e.tag)}${clash.has(e.id)?'<span class="clash">clash</span>':""}</div>
         <div class="ttl">${esc(e.sub && e.tag!=="PARTY" && e.title.length<40 && !/·/.test(e.title) ? e.title+" — "+e.sub : e.title)}</div>
         <div class="where">${esc(e.loc)}</div>
-        <button class="pick" data-pick="${esc(e.id)}" aria-label="${on?"Remove from":"Add to"} my picks">${on?check:plus}</button>
+        ${e.fixed ? `<button class="pick" disabled aria-label="Fixed in my picks">${check}</button>`
+          : `<button class="pick" data-pick="${esc(e.id)}" aria-label="${on?"Remove from":"Add to"} my picks">${on?check:plus}</button>`}
       </div>`; }).join("")}</div></div>`).join("") + `</div>`;
 }
 
@@ -325,9 +342,22 @@ function render(){
   }
   $("main").innerHTML = out;
   document.documentElement.style.setProperty("--hdr", ($("hdr").offsetHeight + 4) + "px");
+  syncDay();
 }
 
-function togglePick(id){ state.picks.has(id) ? state.picks.delete(id) : state.picks.add(id); save(); render(); }
+// Highlight the day tab for the section currently under the sticky header
+function syncDay(){
+  const line = $("hdr").getBoundingClientRect().bottom + 8;
+  let cur = DAYS[0].id;
+  for (const d of DAYS) { const s = $("d-"+d.id); if (s && s.getBoundingClientRect().top <= line) cur = d.id; }
+  if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) cur = DAYS[DAYS.length-1].id;
+  for (const b of $("daynav").children) b.setAttribute("aria-current", b.dataset.day===cur);
+}
+let dayTick = false;
+addEventListener("scroll", () => { if (!dayTick) { dayTick = true; requestAnimationFrame(() => { dayTick = false; syncDay(); }); } }, {passive:true});
+addEventListener("resize", syncDay);
+
+function togglePick(id){ if (isFixed(id)) return; state.picks.has(id) ? state.picks.delete(id) : state.picks.add(id); save(); render(); }
 
 function openSheet(id){
   const e = EVENTS.find(x=>x.id===id); if (!e) return;
@@ -342,8 +372,8 @@ function openSheet(id){
     <div class="row">${d.dow} ${d.n} Oct · ${fmt(e.start)}–${e.noEnd?"end not listed":fmt(e.end)} · ${e.end-e.start} min${e.noEnd?" (assumed)":""}</div>
     <div class="row">${esc(e.loc)}</div>
     <div class="actions">
-      <button class="btn-pick ${on?"on":""}" id="sheetPick">${on?"Remove from my picks":"Add to my picks"}</button>
-      <a class="btn-link" href="${esc(e.url)}" target="_blank" rel="noopener">Event page ↗</a>
+      <button class="btn-pick ${on?"on":""}" id="sheetPick" ${e.fixed?"disabled":""}>${e.fixed?"Fixed in my picks":on?"Remove from my picks":"Add to my picks"}</button>
+      <a class="btn-link" href="${esc(e.url)}" target="_blank" rel="noopener">${e.urlLabel || "Event page ↗"}</a>
     </div>
   </div></div>`;
   $("scrim").onclick = closeSheet;
