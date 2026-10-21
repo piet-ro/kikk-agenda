@@ -241,14 +241,14 @@ for (const d of DAYS) for (const r of RAW[d.id]) {
   if (d.id === ARRIVAL.day && start < ARRIVAL.from) continue;
   EVENTS.push({id:path, day:d.id, tag, start, end, noEnd:!e, title, sub, loc, venue:venueOf(loc), url:"https://kikkfestival.be"+path});
 }
-// Group plan: always in My picks, cannot be removed. [id, day, tag, start, end, title, description, location]
+// Group plan: always in My picks, cannot be removed. [id, day, tag, start, end, title, description, location, map link (optional)]
 const FIXED = [
-  ["fixed-bus","2026-10-22","TRAVEL","10:30","10:45","Gather for bus","","Flixbus station Utrecht, in front of the NH hotel"],
+  ["fixed-bus","2026-10-22","TRAVEL","10:30","10:45","Gather for bus","","Flixbus station Utrecht, in front of the NH hotel","https://maps.app.goo.gl/xbbFccGsa4cTu7ez7"],
   ["fixed-dinner","2026-10-22","DINNER","19:30","21:30","Dinner","Assemble at the hotel at 19:00 to walk there together","Restaurant Balthazar, Namur"]
 ];
-for (const [id,day,tag,s,e,title,sub,loc] of FIXED) {
+for (const [id,day,tag,s,e,title,sub,loc,map] of FIXED) {
   EVENTS.push({id, day, tag, start:toMin(s), end:toMin(e), fixed:true, title, sub, loc, venue:venueOf(loc),
-    url:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc), urlLabel:"Map ↗"});
+    url:map || "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc), urlLabel:"Map ↗"});
 }
 const isFixed = id => EVENTS.some(e => e.id===id && e.fixed);
 
