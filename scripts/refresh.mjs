@@ -53,9 +53,11 @@ try {
     RAW[day] = await cards();
     const partiesBtn = page.getByRole("button", {name: "Parties", exact: true});
     if (await partiesBtn.count()) {
+      // cards can exist but be hidden (the site renders a mobile copy too), so wait for presence, not visibility;
+      // only click again if the filter didn't switch on, as a second click toggles it off
       for (let attempt = 0; attempt < 2; attempt++) {
-        await partiesBtn.first().click();
-        const shown = await page.waitForSelector('a[href^="/parties/"]', {timeout: 8000}).then(() => true, () => false);
+        if (!/filter-btn-active/.test(await partiesBtn.first().getAttribute("class") || "")) await partiesBtn.first().click();
+        const shown = await page.waitForFunction(() => document.querySelector('a[href^="/parties/"]'), null, {timeout: 8000}).then(() => true, () => false);
         if (shown) { await page.waitForTimeout(800); RAW[day].push(...await cards()); break; }
       }
     }
