@@ -31,6 +31,8 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:2px s
 .hero .where{margin-top:14px;color:var(--muted);font-size:17px;font-weight:500;letter-spacing:-.01em}
 .sync{margin-top:6px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
 .sync a{color:var(--ink)}
+.sync .fresh{color:var(--theatre);font-weight:500}
+.sync .fresh a{color:inherit}
 
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 12px;
   margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));border-bottom:1.5px solid var(--line)}
@@ -187,7 +189,7 @@ footer a{color:inherit}
   <div class="hero">
     <h1>KIKK<br>agenda</h1>
     <div class="where">Namur, 22–24 October 2026</div>
-    <div class="sync">Snapshot <span id="snap"></span> · <a href="https://kikkfestival.be/schedule?day=2026-10-22" target="_blank" rel="noopener">kikkfestival.be/schedule ↗</a></div>
+    <div class="sync">Updated <span id="snap"></span><span id="fresh" class="fresh" hidden> · <a href="" id="reload">Updates available, refresh now</a></span></div>
   </div>
   <header id="hdr">
     <div class="controls">
@@ -222,7 +224,9 @@ footer a{color:inherit}
 </div>
 
 <script>
-const SNAPSHOT = "2026-10-21 14:58";
+// Written by scripts/refresh.mjs on every scheduled refresh (Brussels time) together with version.json
+const SNAPSHOT = "2026-10-22 10:22";
+const DATA_HASH = "585bd455f881";
 const VENUES = {
   bourse:{name:"La Bourse", c:"--bourse"},
   theatre:{name:"Théâtre de Namur", c:"--theatre"},
@@ -237,88 +241,90 @@ const DAYS = [
 // [tag, start, end, title, subtitle, location, path]
 const RAW = {
 "2026-10-22":[
-["DELEGATION","10:30","11:30","From Experiment to Ecosystem: Where Creativity, Research, Innovation & Technology Meet.","Virtual Switzerland · SUPSI · Zürcher Hochschule der Künste (ZhDK) · PRISM · Fondation pour la Création Numérique / Pôle Numérique / Pyxis Explo | Moderator: Wallonia-Brussels International","La Bourse — Auditoire Michaux","/panels/from-experiment-to-ecosystem-where-creativity-research-innovation-technology-meet-panel-kikk2026"],
-["DELEGATION","11:50","12:50","Artist Talk : \"Sound, Systems, and Who Controls Them\"","Deena Abdelwahed | Moderator: NEW INC / NEW Museum","La Bourse — Auditoire Michaux","/panels/artist-talk-sound-systems-and-who-controls-them-panel-kikk2026"],
-["DELEGATION","14:00","15:00","Making It Real","Agence Consors (Canada) · OMBRA Studio (Italy) · Drop The Spoon (Belgium) · Festival Volumens & Radiante Studio (Spain) | Moderator: Barbican Immersive","La Bourse — Auditoire Michaux","/panels/making-it-real-panel-kikk2026"],
-["DELEGATION","15:20","16:20","Reimagine/ Reinventing the City","Oulu2026 European Capital of Culture (Finland) · Canary Wharf Group (United Kingdom) · 1535° Creative Hub Differdange (Luxembourg) · Filmmaster (Italy) | Moderator: Brussels Major Events (BME)","La Bourse — Auditoire Michaux","/panels/reimagine-reinventing-the-city-panel-kikk2026"],
-["DELEGATION","16:30","17:30","Curating Under Constraint","Curator · INTERFERENCE Tunis / SEE DJERBA Houmt Souk · Howest Digital Arts & Entertainment Research · InterAccess | Moderator: Independant curator","La Bourse — Auditoire Michaux","/panels/curating-under-constraint-panel-kikk2026"],
-["WAKE!ROOM","12:30","13:05","Pitch Sessions - UBV & AMPLO","UBV · Amplo","La Bourse — Plein Ciel","/panels/ubv-pitch-panel-kikk2026"],
-["WAKE!ROOM","15:00","15:50","PANEL - CinEuro Film Lab: Unlocking Opportunities across Europe’s Film & Creative Industries","Region Grand Est · BLIIIDA · Wallimage · FILM FUND LUXEMBOURG | Moderator: Region Grand Est","La Bourse — Plein Ciel","/panels/cineuro-film-lab-unlocking-opportunities-across-europecs-film-creative-industries-panel-kikk2026"],
-["WAKE!ROOM","16:00","17:15","PITCH SESSIONS - Vanna, Cercle des créateurs digitaux, United XR & OKUS Lab","Vanna (legal entity name - Freya SRL) · Cercle des créateurs digitaux · United XR · OKUS Lab","La Bourse — Plein Ciel","/panels/building-spaces-of-inspiration-and-experimentation-for-creative-professionals-panel-kikk2026"],
-["KIKK LIVE INDUSTRIES","11:00","11:40","Stephen O'Reilly","Ventures & Building Beyond the Artist","Théâtre de Namur — Le Studio","/talks/stephen-onreilly-talk-kikk2026"],
-["KIKK LIVE INDUSTRIES","12:00","13:00","From Event to Experience","Moment Factory · Lux Entertainment / Balloon Museum · Public Art Company | Moderator: Fever","Théâtre de Namur — Le Studio","/panels/from-event-to-experience-panel-kikk2026"],
-["KIKK LIVE INDUSTRIES","15:20","16:20","Beyond Stereo: The Rise of Immersive Sound","Polygon Productions · Club Wintercircus · AREAL Technologies · Delacroix Studio | Moderator: PXL-Music / Audio Engineering Society","Théâtre de Namur — Le Studio","/panels/beyond-stereo-the-rise-of-immersive-sound-panel-kikk2026"],
 ["TALK","10:20","11:00","Moritz Stefaner","Beyond the bar chart","Théâtre de Namur — Main Stage","/talks/moritz-stefaner-talk-kikk2026"],
-["TALK","11:20","12:00","Memo Akten","Seeing like a machine","Théâtre de Namur — Main Stage","/talks/memo-akten-solo-talk-talk-kikk2026"],
-["TALK","12:20","13:00","Paul Nicholls — Factory Fifteen","Building Worlds for The Sphere","Théâtre de Namur — Main Stage","/talks/building-worlds-for-the-sphere-talk-kikk2026"],
-["KIKK LIVE INDUSTRIES","14:15","15:15","SOULWAX / 2MANYDJS","SOULWAX: NO FIXED FORMAT","Théâtre de Namur — Main Stage","/talks/soulwax-2manydjs-talk-kikk2026"],
-["TALK","15:30","16:10","Clara Gaggero Westaway — Special Projects","From Frustration to Wonder: Redesigning our Relationship with Tech","Théâtre de Namur — Main Stage","/talks/special-projects-talk-kikk2026"],
-["TALK","16:30","17:10","Gavin Strange — Studio Aardman","LESS THINKERING, MORE TINKERING","Théâtre de Namur — Main Stage","/talks/gavin-strange-talk-kikk2026"],
-["TALK","17:30","18:10","Vera van de Seyp","Computational Craft","Théâtre de Namur — Main Stage","/talks/vera-van-de-seyp-talk-kikk2026"],
-["TALK","18:30","19:10","PJ Richardson / Laundry","Don't wait for permission: Cheat codes for thriving as a creative","Théâtre de Namur — Main Stage","/talks/pj-richardson-laundry-talk-kikk2026"],
+["DELEGATION","10:30","11:30","From Experiment to Ecosystem: Where Creativity, Research, Innovation & Technology Meet.","Virtual Switzerland · SUPSI (Scuola universitaria professionale della Svizzera italiana) · Zürcher Hochschule der Künste (ZhDK) · PRISM · Fondation pour la Création Numérique / Pôle Numérique / Pyxis Explo | Moderator: Wallonia-Brussels International","La Bourse — Auditoire Michaux","/panels/from-experiment-to-ecosystem-where-creativity-research-innovation-technology-meet-panel-kikk2026"],
 ["TALK","10:50","11:30","Isabelle Arvers & Ezéchiel Sene-Boileau","Video Games in Dialogue With Ancestral Knowledge, From Ritual to Interactive Music","La Bourse — Auditoire Rops","/talks/video-games-in-dialogue-with-ancestral-knowledge-from-ritual-to-interactive-music-talk-kikk2026"],
-["TALK","11:50","12:30","Romain Prache & Marc-André Dandurand — REF Digital","It's not you, it's us: Understanding client personas and how to work with them","La Bourse — Auditoire Rops","/talks/itns-not-you-itns-us-understanding-client-personas-and-how-to-work-with-them-talk-kikk2026"],
-["TALK","14:20","15:00","Lauren Moffatt","Augmenting the Unseeable: Representation at the limits of perception","La Bourse — Auditoire Rops","/talks/lauren-moffatt-talk-kikk2026"],
-["TALK","15:20","16:00","Mélanie Courtinat","Creative Detours: How Videogames Led Me Everywhere Else","La Bourse — Auditoire Rops","/talks/melanie-courtinat-talk-kikk2026"],
-["TALK","16:20","17:00","Marina Otero Verzier","Explosions","La Bourse — Auditoire Rops","/talks/marina-otero-verzier-talk-kikk2026"],
-["TALK","17:20","18:00","Henry Daubrez — ODD KID","Hot or Slop?","La Bourse — Auditoire Rops","/talks/henry-daubrez-talk-kikk2026"],
+["KIKK LIVE INDUSTRIES","11:00","11:40","Stephen O'Reilly","Ventures & Building Beyond the Artist","Théâtre de Namur — Le Studio","/talks/stephen-onreilly-talk-kikk2026"],
 ["TALK","11:10","11:50","Loulou João","All roads lead to Bubble Bebe","Le Delta","/talks/loulou-joao-talk-kikk2026"],
+["TALK","11:20","12:00","Memo Akten","Seeing like a machine","Théâtre de Namur — Main Stage","/talks/memo-akten-solo-talk-talk-kikk2026"],
+["WAKE!ROOM","11:30","12:30","Animation, VFX & AI: Anatomy of a Creative Evolution","Benuts · Dreamwall | Moderator: UBV","La Bourse — Plein Ciel","/panels/animation-vfx-ai-anatomy-of-a-creative-evolution-panel-kikk2026"],
+["DELEGATION","11:50","12:50","Artist Talk : \"Sound, Systems, and Who Controls Them\"","Deena Abdelwahed | Moderator: NEW INC / NEW Museum","La Bourse — Auditoire Michaux","/panels/artist-talk-sound-systems-and-who-controls-them-panel-kikk2026"],
+["TALK","11:50","12:30","Romain Prache & Marc-André Dandurand — REF Digital","It's not you, it's us: Understanding client personas and how to work with them","La Bourse — Auditoire Rops","/talks/itns-not-you-itns-us-understanding-client-personas-and-how-to-work-with-them-talk-kikk2026"],
+["KIKK LIVE INDUSTRIES","12:00","13:00","From Event to Experience","Moment Factory · Lux Entertainment / Balloon Museum · Public Art Company | Moderator: Fever","Théâtre de Namur — Le Studio","/panels/from-event-to-experience-panel-kikk2026"],
 ["TALK","12:10","12:50","Dries Depoorter","New Work, Dead Work","Le Delta","/talks/dries-depoorter-talk-kikk2026"],
+["TALK","12:20","13:00","Paul Nicholls — Factory Fifteen","Building Worlds for The Sphere","Théâtre de Namur — Main Stage","/talks/building-worlds-for-the-sphere-talk-kikk2026"],
+["WAKE!ROOM","12:30","13:05","Pitch Sessions - UBV & AMPLO","UBV · Amplo","La Bourse — Plein Ciel","/panels/ubv-pitch-panel-kikk2026"],
+["DELEGATION","14:00","15:00","Making It Real","Agence Consors (Canada) · OMBRA Studio (Italy) · Drop The Spoon (Belgium) · Festival Volumens & Radiante Studio (Spain) | Moderator: Barbican Immersive","La Bourse — Auditoire Michaux","/panels/making-it-real-panel-kikk2026"],
 ["TALK","14:10","14:50","David Houncheringer & Valerio Spoletini — Encor Studio","The Subtractive Path: A journey into Encor Studio’s research and creative process.","Le Delta","/talks/valerio-spoletini-encor-studio-talk-kikk2026"],
+["KIKK LIVE INDUSTRIES","14:15","15:15","SOULWAX / 2MANYDJS","SOULWAX: NO FIXED FORMAT","Théâtre de Namur — Main Stage","/talks/soulwax-2manydjs-talk-kikk2026"],
+["TALK","14:20","15:00","Lauren Moffatt","Augmenting the Unseeable: Representation at the limits of perception","La Bourse — Auditoire Rops","/talks/lauren-moffatt-talk-kikk2026"],
+["WAKE!ROOM","15:00","15:50","PANEL - CinEuro Film Lab: Unlocking Opportunities across Europe’s Film & Creative Industries","Region Grand Est · BLIIIDA · Wallimage · FILM FUND LUXEMBOURG | Moderator: Region Grand Est","La Bourse — Plein Ciel","/panels/cineuro-film-lab-unlocking-opportunities-across-europecs-film-creative-industries-panel-kikk2026"],
 ["TALK","15:10","15:50","Danielle Brathwaite-Shirley","BEING A REVOLUTION","Le Delta","/talks/danielle-brathwaite-shirley-talk-kikk2026"],
+["DELEGATION","15:20","16:20","Reimagine/ Reinventing the City","Oulu2026 European Capital of Culture (Finland) · Canary Wharf Group (United Kingdom) · 1535° Creative Hub Differdange (Luxembourg) · Filmmaster (Italy) | Moderator: Brussels Major Events (BME)","La Bourse — Auditoire Michaux","/panels/reimagine-reinventing-the-city-panel-kikk2026"],
+["KIKK LIVE INDUSTRIES","15:20","16:20","Beyond Stereo: The Rise of Immersive Sound","Polygon Productions · Club Wintercircus · AREAL Technologies · Delacroix Studio | Moderator: PXL-Music / Audio Engineering Society","Théâtre de Namur — Le Studio","/panels/beyond-stereo-the-rise-of-immersive-sound-panel-kikk2026"],
+["TALK","15:20","16:00","Mélanie Courtinat","Creative Detours: How Videogames Led Me Everywhere Else","La Bourse — Auditoire Rops","/talks/melanie-courtinat-talk-kikk2026"],
+["TALK","15:30","16:10","Clara Gaggero Westaway — Special Projects","From Frustration to Wonder: Redesigning our Relationship with Tech","Théâtre de Namur — Main Stage","/talks/special-projects-talk-kikk2026"],
+["WAKE!ROOM","16:00","17:15","PITCH SESSIONS - Vanna, Cercle des créateurs digitaux, United XR & OKUS Lab","Vanna (legal entity name - Freya SRL) · Cercle des créateurs digitaux · United XR · OKUS Lab","La Bourse — Plein Ciel","/panels/building-spaces-of-inspiration-and-experimentation-for-creative-professionals-panel-kikk2026"],
 ["TALK","16:10","16:50","Justine Soulié & Patrick Heng — Ponpon Mania","Ponpon Mania - Blending storytelling, illustration and creative coding","Le Delta","/talks/ponpon-mania-blending-storytelling-illustration-and-creative-coding-talk-kikk2026"],
-["PARTY","17:30","20:30","LARSON","Warmup drink x LARSON (vinyl set)","Théâtre de Namur — Le Foyer","/parties/thu-22-oct-17-30-20-30-afterwork-x-larson-party-kikk2026"],
-["PARTY","21:00","01:45","LES EMPIRES · Elsewhere in India · Deena Abdelwahed · Papyluc Soundsystem","Opening party · KIKK × MUTEK","La Nef","/parties/kikk-opening-party-party-kikk2026"]
+["TALK","16:20","17:00","Marina Otero Verzier","Explosions","La Bourse — Auditoire Rops","/talks/marina-otero-verzier-talk-kikk2026"],
+["DELEGATION","16:30","17:30","Curating Under Constraint","Curator · INTERFERENCE Tunis / SEE DJERBA Houmt Souk · Howest Digital Arts & Entertainment Research · InterAccess | Moderator: Independant curator","La Bourse — Auditoire Michaux","/panels/curating-under-constraint-panel-kikk2026"],
+["TALK","16:30","17:10","Gavin Strange — Studio Aardman","LESS THINKERING, MORE TINKERING","Théâtre de Namur — Main Stage","/talks/gavin-strange-talk-kikk2026"],
+["TALK","17:20","18:00","Henry Daubrez — ODD KID","Hot or Slop?","La Bourse — Auditoire Rops","/talks/henry-daubrez-talk-kikk2026"],
+["TALK","17:30","18:10","Vera van de Seyp","Computational Craft","Théâtre de Namur — Main Stage","/talks/vera-van-de-seyp-talk-kikk2026"],
+["PARTY","17:30","20:30","LARSON","WARMUP DRINK x LARSON (Vinyl set)","Le Foyer - Théâtre de Namur","/parties/thu-22-oct-17-30-20-30-afterwork-x-larson-party-kikk2026"],
+["TALK","18:30","19:10","PJ Richardson / Laundry","Don't wait for permission: Cheat codes for thriving as a creative","Théâtre de Namur — Main Stage","/talks/pj-richardson-laundry-talk-kikk2026"],
+["PARTY","21:00","01:45","LES EMPIRES · Elsewhere in India · Deena Abdelwahed · Papyluc Soundsystem","LA NEF · KIKK × MUTEK","La Nef","/parties/kikk-opening-party-party-kikk2026"]
 ],
 "2026-10-23":[
+["TALK","10:20","11:00","Mario Klingemann — Quasimondo","Three Wishes Later","Théâtre de Namur — Main Stage","/talks/mario-klingemann-talk-kikk2026"],
 ["TALK","10:30","11:10","Pier Schneider — 1024 Architecture","1024 x MADMAPPER : History of the Interplay","La Bourse — Auditoire Michaux","/talks/pier-schneider-talk-kikk2026"],
-["PANEL","11:30","12:30","Play Testing Digital Transformation","NODE · Creative Coding Utrecht · Marie Verdeil | Moderator: KIKK","La Bourse — Auditoire Michaux","/panels/play-testing-digital-transformation-panel-kikk2026-1"],
-["DELEGATION","14:00","15:00","Senses and Sensibility: When Immersion Looks Beyond Vision, presented by XN Québec","Managing Partner · Society for arts and technology (SAT) · Noukii | Moderator: Xn Québec","La Bourse — Auditoire Michaux","/panels/senses-and-sensibility-when-immersion-looks-beyond-vision-presented-by-xn-quebec-panel-kikk2026"],
-["DELEGATION","15:30","16:30","Coding Heritage","Antariksha Studio / Elsewhere in India (India) · Elsewhere in India (India) · Papegaai (Belgium) · MMAD | Moderator: ArtCoustic Studio (Morocco)","La Bourse — Auditoire Michaux","/panels/coding-heritage-panel-kikk2026"],
-["WAKE!ROOM","11:45","12:20","PITCH : Écosystème créatif immersif Européen, Mythe ou Réalité","Moderator: Correspondances Digitales","La Bourse — Plein Ciel","/panels/ecosysteme-creatif-immersif-europeen-mythe-ou-realite-panel-kikk2026"],
-["WAKE!ROOM","14:00","15:25","PITCH SESSIONS - Deepmedia, REALM, FOKUS IMMERSIVE / OKUS LAB & VIBZ","FOKUS IMMERSIVE / OKUS LAB · Deepmedia · REALM · VIBZ","La Bourse — Plein Ciel","/panels/fokus-immersive-dance-meets-vr-and-ar-panel-kikk2026"],
-["WAKE!ROOM","15:30","16:30","Creative industries: business as unusual","Deloitte Luxembourg · Wallimage · St'Art Invest · WERO | Moderator: 1535° Creative Hub","La Bourse — Plein Ciel","/panels/creative-industries-business-as-unusual-panel-kikk2026-2"],
-["WAKE!ROOM","16:35","16:50","PITCH - Créatifs et Devs : Décoder la collaboration créative","Moderator: Anthony Bayet","La Bourse — Plein Ciel","/panels/creatifs-et-devs-decoder-la-collaboration-creative-panel-kikk2026"],
 ["S+T+ARTS AQUAMOTION ROOM","10:40","11:00","Antoine Bertin","Fish String Theory: a fish that sings at sunset in the mediterranean sea","Théâtre de Namur — Le Studio","/talks/fish-string-theory-a-fish-that-sings-at-sunset-in-the-mediterranean-sea-talk-kikk2026"],
+["TALK","10:50","11:30","Andrew Hill — Random Studio","You won't even know I was there","La Bourse — Auditoire Rops","/talks/andrew-hill-talk-kikk2026"],
+["TALK","11:10","11:50","Laura Civetti","From pixel to material","Le Delta","/talks/from-pixel-to-material-talk-kikk2026"],
+["TALK","11:20","12:00","Tim Rodenbröker","Downgrade","Théâtre de Namur — Main Stage","/talks/tim-rodenbroker-talk-kikk2026"],
+["PANEL","11:30","12:30","Play Testing Digital Transformation","NODE · Creative Coding Utrecht · Marie Verdeil | Moderator: KIKK","La Bourse — Auditoire Michaux","/panels/play-testing-digital-transformation-panel-kikk2026-1"],
 ["S+T+ARTS AQUAMOTION ROOM","11:40","11:50","Lukas Taido","Aqua Ductus – Water Traces","Théâtre de Namur — Le Studio","/talks/aqua-ductus-water-traces-talk-kikk2026"],
 ["S+T+ARTS AQUAMOTION ROOM","11:40","11:50","Micol Grazioli","The Rain Paths","Théâtre de Namur — Le Studio","/talks/the-rain-paths-talk-kikk2026"],
+["WAKE!ROOM","11:45","12:20","PITCH : Écosystème créatif immersif Européen, Mythe ou Réalité","Moderator: Correspondances Digitales","La Bourse — Plein Ciel","/panels/ecosysteme-creatif-immersif-europeen-mythe-ou-realite-panel-kikk2026"],
 ["S+T+ARTS AQUAMOTION ROOM","11:50","12:50","Alex Jordan","The Behavioural Nebula and the underwater event horizon","Théâtre de Namur — Le Studio","/talks/the-behavioural-nebula-and-the-underwater-event-horizon-talk-kikk2026"],
 ["AQUAMOTION ROOM","11:50","12:50","Water Resonances: Listening, Translating, Advocating","Max Plank Institute · S+T+ARTS AQUA MOTION · Fondation Tara Océan | Moderator: OHME","Théâtre de Namur — Le Studio","/panels/water-resonances-listening-translating-advocating-panel-kikk2026"],
+["TALK","11:50","12:30","Gwenael François — Skilllab","BETWEEN CURIOSITY AND EXPERIMENTATION","La Bourse — Auditoire Rops","/talks/gwenael-frannois-talk-kikk2026"],
+["TALK","12:10","12:50","Adriano Esteves — Bürocratik","Craft. Make It Matter or Die Trying.","Le Delta","/talks/adriano-esteves-talk-kikk2026"],
+["TALK","12:20","13:00","Leonardo Giusti — Archetype AI","Living Objects: Designing Products That Grow With Us","Théâtre de Namur — Main Stage","/talks/leonardo-giusti-talk-kikk2026"],
+["DELEGATION","14:00","15:00","Senses and Sensibility: When Immersion Looks Beyond Vision, presented by XN Québec","Managing Partner · Society for arts and technology (SAT) · Noukii | Moderator: Xn Québec","La Bourse — Auditoire Michaux","/panels/senses-and-sensibility-when-immersion-looks-beyond-vision-presented-by-xn-quebec-panel-kikk2026"],
+["WAKE!ROOM","14:00","15:25","PITCH SESSIONS - Deepmedia, REALM, FOKUS IMMERSIVE / OKUS LAB & VIBZ","FOKUS IMMERSIVE / OKUS LAB · Deepmedia · REALM · VIBZ","La Bourse — Plein Ciel","/panels/fokus-immersive-dance-meets-vr-and-ar-panel-kikk2026"],
 ["S+T+ARTS AQUAMOTION ROOM","14:00","14:30","Filipa Ramos","She, Argonaut: Curiosity and Invention Beneath the Surface","Théâtre de Namur — Le Studio","/talks/she-argonaut-curiosity-and-invention-beneath-the-surface-talk-kikk2026"],
 ["AQUAMOTION ROOM","14:00","14:30","Echoes from Below","Joint Research Center, EU Policy Lab · Marshmallow Laser Feast · S+T+ARTS AQUA MOTION | Moderator: Filipa Ramos","Théâtre de Namur — Le Studio","/panels/echoes-from-below-panel-kikk2026"],
-["S+T+ARTS AQUAMOTION ROOM","14:30","15:00","Ersin Han Ersin","In the Mind of the Whale","Théâtre de Namur — Le Studio","/talks/in-the-mind-of-the-whale-talk-kikk2026"],
-["S+T+ARTS AQUAMOTION ROOM","15:10","15:20","A Recoletora","Salt Mouth: Expanded Archive","Théâtre de Namur — Le Studio","/talks/salt-mouth-expanded-archive-talk-kikk2026"],
-["AQUAMOTION ROOM","16:20","17:00","HIDROTOPIAS: Living with Changing Waters - Art, Communities & Ecological Adaptation","Ioana Vreme Moser · Floriama Cândea · Pepa Ivanova | Moderator: Obsolete Studio","Théâtre de Namur — Le Studio","/panels/hidrotopias-living-with-changing-waters-art-communities-ecological-adaptation-panel-kikk2026"],
-["S+T+ARTS AQUAMOTION ROOM","17:00","17:30","Tom Mustill","Sounds Fishy- Unexpected discoveries from the frontiers of underwater signal exploration","Théâtre de Namur — Le Studio","/talks/sounds-fishy-unexpected-discoveries-from-the-frontiers-of-underwater-signal-exploration-talk-kikk2026"],
-["TALK","10:20","11:00","Mario Klingemann — Quasimondo","Three Wishes Later","Théâtre de Namur — Main Stage","/talks/mario-klingemann-talk-kikk2026"],
-["TALK","11:20","12:00","Tim Rodenbröker","Downgrade","Théâtre de Namur — Main Stage","/talks/tim-rodenbroker-talk-kikk2026"],
-["TALK","12:20","13:00","Leonardo Giusti — Archetype AI","Living Objects: Designing Products That Grow With Us","Théâtre de Namur — Main Stage","/talks/leonardo-giusti-talk-kikk2026"],
-["TALK","14:30","15:10","Memo Akten & Katie Hofstadter — Superradiance","Cosmosapience: Embodying our Planetary Mind","Théâtre de Namur — Main Stage","/talks/memo-akten-katie-hofstadter-talk-kikk2026"],
-["TALK","15:30","16:10","Marina Willer — Pentagram","Human First","Théâtre de Namur — Main Stage","/talks/marina-willer-talk-kikk2026"],
-["TALK","16:30","17:10","Catherine Turp — Moment Factory","WHEN EXPERIENCES BECOME ALIVE","Théâtre de Namur — Main Stage","/talks/catherine-turp-talk-kikk2026"],
-["TALK","17:30","18:10","David Sheldon-Hicks — Territory Studio","Future Mapping","Théâtre de Namur — Main Stage","/talks/david-sheldon-hicks-talk-kikk2026"],
-["TALK","18:30","19:10","Lukas Bentel","","Théâtre de Namur — Main Stage","/talks/lukas-bentel-talk-kikk2026"],
-["TALK","10:50","11:30","Andrew Hill — Random Studio","You won't even know I was there","La Bourse — Auditoire Rops","/talks/andrew-hill-talk-kikk2026"],
-["TALK","11:50","12:30","Gwenael François — Skilllab","BETWEEN CURIOSITY AND EXPERIMENTATION","La Bourse — Auditoire Rops","/talks/gwenael-frannois-talk-kikk2026"],
-["TALK","14:20","15:00","Victor Verhelst","TUNING IS THERAPY","La Bourse — Auditoire Rops","/talks/victor-verhelst-talk-kikk2026"],
-["TALK","15:20","16:00","HAQUE TAN","Why Bother? Design for Shared Futures","La Bourse — Auditoire Rops","/talks/haque-tan-talk-kikk2026"],
-["TALK","16:20","17:00","Pierre-Alain Giraud","Staging Absence: The making of Noire / Colored and Playing with Fire","La Bourse — Auditoire Rops","/talks/pierre-alain-giraud-talk-kikk2026"],
-["TALK","17:20","18:00","Klasien van de Zandschulp — Affect lab","Cow Data and Hot Flashes: What Bodies Teach Us","La Bourse — Auditoire Rops","/talks/klasien-van-de-zandschulp-talk-kikk2026"],
-["TALK","11:10","11:50","Laura Civetti","From pixel to material","Le Delta","/talks/from-pixel-to-material-talk-kikk2026"],
-["TALK","12:10","12:50","Adriano Esteves — Bürocratik","Craft. Make It Matter or Die Trying.","Le Delta","/talks/adriano-esteves-talk-kikk2026"],
 ["TALK","14:10","14:50","Marta Cerdà Alimbau","Type to Image","Le Delta","/talks/type-to-image-talk-kikk2026"],
+["TALK","14:20","15:00","Victor Verhelst","TUNING IS THERAPY","La Bourse — Auditoire Rops","/talks/victor-verhelst-talk-kikk2026"],
+["S+T+ARTS AQUAMOTION ROOM","14:30","15:00","Ersin Han Ersin","In the Mind of the Whale","Théâtre de Namur — Le Studio","/talks/in-the-mind-of-the-whale-talk-kikk2026"],
+["TALK","14:30","15:10","Memo Akten & Katie Hofstadter — Superradiance","Cosmosapience: Embodying our Planetary Mind","Théâtre de Namur — Main Stage","/talks/memo-akten-katie-hofstadter-talk-kikk2026"],
+["S+T+ARTS AQUAMOTION ROOM","15:10","15:20","A Recoletora","Salt Mouth: Expanded Archive","Théâtre de Namur — Le Studio","/talks/salt-mouth-expanded-archive-talk-kikk2026"],
 ["TALK","15:10","15:50","Lauren Lundholm — CLEVER°FRANKE","Lessons Learnt the Hard Way","Le Delta","/talks/lauren-lundholm-talk-kikk2026"],
+["TALK","15:20","16:00","HAQUE TAN","Why Bother? Design for Shared Futures","La Bourse — Auditoire Rops","/talks/haque-tan-talk-kikk2026"],
+["DELEGATION","15:30","16:30","Coding Heritage","Antariksha Studio / Elsewhere in India (India) · Elsewhere in India (India) · Papegaai (Belgium) · MMAD | Moderator: ArtCoustic Studio (Morocco)","La Bourse — Auditoire Michaux","/panels/coding-heritage-panel-kikk2026"],
+["WAKE!ROOM","15:30","16:30","Creative industries: business as unusual","Deloitte Luxembourg · Wallimage · St'Art Invest · WERO | Moderator: 1535° Creative Hub","La Bourse — Plein Ciel","/panels/creative-industries-business-as-unusual-panel-kikk2026-2"],
+["TALK","15:30","16:10","Marina Willer — Pentagram","Human First","Théâtre de Namur — Main Stage","/talks/marina-willer-talk-kikk2026"],
 ["TALK","16:10","16:50","Valeria Moreiro — NotReal","What does it mean to be creative today?","Le Delta","/talks/what-does-it-mean-to-be-creative-today-talk-kikk2026"],
-["PARTY","17:30","20:30","Azo","Warmup drink x AZO (DJ set)","Théâtre de Namur — Le Foyer","/parties/fri-23-oct-17-30-20-00-afterwork-x-azo-party-kikk2026"],
-["PARTY","21:30","01:45","Martin Messier — 1 DROP 1000 YEARS + Dalidark b2b Joe d’Absynth","After party · KIKK × MUTEK","Le Delta","/parties/kikk-after-party-party-kikk2026"]
+["AQUAMOTION ROOM","16:20","17:00","HIDROTOPIAS: Living with Changing Waters - Art, Communities & Ecological Adaptation","Ioana Vreme Moser · Floriama Cândea · Pepa Ivanova | Moderator: Obsolete Studio","Théâtre de Namur — Le Studio","/panels/hidrotopias-living-with-changing-waters-art-communities-ecological-adaptation-panel-kikk2026"],
+["TALK","16:20","17:00","Pierre-Alain Giraud","Staging Absence: The making of Noire / Colored and Playing with Fire","La Bourse — Auditoire Rops","/talks/pierre-alain-giraud-talk-kikk2026"],
+["TALK","16:30","17:10","Catherine Turp — Moment Factory","WHEN EXPERIENCES BECOME ALIVE","Théâtre de Namur — Main Stage","/talks/catherine-turp-talk-kikk2026"],
+["WAKE!ROOM","16:35","16:50","PITCH - Créatifs et Devs : Décoder la collaboration créative","Moderator: Anthony Bayet","La Bourse — Plein Ciel","/panels/creatifs-et-devs-decoder-la-collaboration-creative-panel-kikk2026"],
+["S+T+ARTS AQUAMOTION ROOM","17:00","17:30","Tom Mustill","Sounds Fishy- Unexpected discoveries from the frontiers of underwater signal exploration","Théâtre de Namur — Le Studio","/talks/sounds-fishy-unexpected-discoveries-from-the-frontiers-of-underwater-signal-exploration-talk-kikk2026"],
+["TALK","17:20","18:00","Klasien van de Zandschulp — Affect lab","Cow Data and Hot Flashes: What Bodies Teach Us","La Bourse — Auditoire Rops","/talks/klasien-van-de-zandschulp-talk-kikk2026"],
+["TALK","17:30","18:10","David Sheldon-Hicks — Territory Studio","Future Mapping","Théâtre de Namur — Main Stage","/talks/david-sheldon-hicks-talk-kikk2026"],
+["PARTY","17:30","20:30","Azo","WARMUP DRINK x AZO (DJ Set)","Le Foyer - Théâtre de Namur","/parties/fri-23-oct-17-30-20-00-afterwork-x-azo-party-kikk2026"],
+["TALK","18:30","19:10","Lukas Bentel","","Théâtre de Namur — Main Stage","/talks/lukas-bentel-talk-kikk2026"],
+["PARTY","21:30","01:45","Martin Messier — 1 DROP 1000 YEARS + Dalidark b2b Joe d’Absynth","LE DELTA · KIKK × MUTEK","Delta","/parties/kikk-after-party-party-kikk2026"]
 ],
 "2026-10-24":[
-["PARTY","20:00","","Sarah Davachi — Live Organ Concert","KIKK × MUTEK","Église Saint-Loup","/parties/kikk-orgues-party-kikk2026"]
+["PARTY","20:00","","Sarah Davachi — Live Organ Concert","SAINT-LOUP CHURCH · KIKK × MUTEK","Église Saint-Loup","/parties/kikk-orgues-party-kikk2026"]
 ]};
 
 // Event images by path: file in the festival's Supabase gallery (image_url on kikkfestival.be). Events without an entry render without an image.
 const IMG_BASE = "https://himwmqovpohyivdytgkh.supabase.co/storage/v1/render/image/public/gallery/";
 const IMAGES = {
+"/panels/animation-vfx-ai-anatomy-of-a-creative-evolution-panel-kikk2026":"media-library/1792655682324-t40y7qy3799.jpg",
 "/panels/artist-talk-sound-systems-and-who-controls-them-panel-kikk2026":"media-library/1791448583004-zvan9tuqwu.png",
 "/panels/beyond-stereo-the-rise-of-immersive-sound-panel-kikk2026":"media-library/1791562002757-xz5gz7t1mr.avif",
 "/panels/building-spaces-of-inspiration-and-experimentation-for-creative-professionals-panel-kikk2026":"media-library/1792050686460-pl8h325qm3.jpeg",
@@ -373,6 +379,7 @@ const IMAGES = {
 "/talks/memo-akten-katie-hofstadter-talk-kikk2026":"cropped/a376e33d-0c3b-4878-9270-aadeefd4dce6.jpg",
 "/talks/memo-akten-solo-talk-talk-kikk2026":"media-library/1790780309610-tkwbqg2rrvf.jpg",
 "/talks/moritz-stefaner-talk-kikk2026":"media-library/1777903969195-4l2aiehg0lq.png",
+"/talks/pier-schneider-talk-kikk2026":"media-library/1792070866092-jdb2ekbwte.avif",
 "/talks/pierre-alain-giraud-talk-kikk2026":"cropped/c02f2392-f2a7-473a-8717-a9c4b1052662.jpg",
 "/talks/pj-richardson-laundry-talk-kikk2026":"cropped/cace42f4-766b-4876-9624-ea6227d40146.jpg",
 "/talks/ponpon-mania-blending-storytelling-illustration-and-creative-coding-talk-kikk2026":"cropped/7fe05bc7-2b21-4a0a-abd1-279ff35d417f.jpg",
@@ -382,6 +389,7 @@ const IMAGES = {
 "/talks/sounds-fishy-unexpected-discoveries-from-the-frontiers-of-underwater-signal-exploration-talk-kikk2026":"media-library/1791817778068-wxvw6g6rufs.png",
 "/talks/special-projects-talk-kikk2026":"cropped/595c5ce3-c122-4b74-a388-ee22c7a66379.jpg",
 "/talks/stephen-onreilly-talk-kikk2026":"media-library/1791539626997-ijhks73auy.jpg",
+"/talks/the-behavioural-nebula-and-the-underwater-event-horizon-talk-kikk2026":"media-library/1791818732871-lkibt9o684h.png",
 "/talks/the-rain-paths-talk-kikk2026":"media-library/1791826946084-qkaxmtzw29.jpg",
 "/talks/tim-rodenbroker-talk-kikk2026":"media-library/1788264417564-wv63vtqf80k.jpg",
 "/talks/type-to-image-talk-kikk2026":"media-library/1790956124215-opfsexwyqx.jpeg",
@@ -394,6 +402,7 @@ const IMAGES = {
 
 // Event descriptions by path, plain text from each event page on kikkfestival.be (paragraphs split by blank lines).
 const DESCR = {
+"/panels/animation-vfx-ai-anatomy-of-a-creative-evolution-panel-kikk2026":"New technologies and artificial intelligence are reshaping the way images are imagined, built and brought to life. But beyond the hype and the fears, what is really changing in the studio? This panel offers an honest look at where things stand today, sharing what these tools concretely bring to animation and VFX work, and where they still fall short. The conversation explores how creative practice is evolving, one experiment at a time.",
 "/panels/artist-talk-sound-systems-and-who-controls-them-panel-kikk2026":"A conversation with Deena Abdelwahed on sound as a site of resistance — how electronic music becomes a space to claim artistic freedom, push back against gatekeeping, and question who controls the systems that shape what gets heard and by whom. Moderated by Salome Asega, whose own work interrogating who holds power over technology brings a sharp, complementary lens to the discussion.",
 "/panels/beyond-stereo-the-rise-of-immersive-sound-panel-kikk2026":"For decades, live music has largely been built around the same idea: a stage in front of an audience, with sound projected towards them. Spatial audio is beginning to challenge that model.\n\nImmersive stages are appearing at festivals, clubs are being designed around 360° sound systems, dedicated listening rooms are turning album playback into a collective experience, and artists and sound designers are increasingly treating sound as a space audiences can physically enter.\n\nRather than simply coming from the stage, music can now move above, behind and around the listener, transforming sound into a powerful tool for storytelling, emotion, presence and experience design.\n\nBut what does this shift mean for the future of live entertainment? How does spatial sound change the relationship between artists and audiences? What new creative possibilities emerge when musicians, venues, engineers and experience designers start thinking beyond stereo from the very beginning? And can immersive sound move from spectacular one-off experiences to become a new standard for live music and entertainment?\n\nBringing together perspectives from Polygon Productions, Club Wintercircus, AREAL Technologies and Delacroix Studio, alongside audio research, this panel explores the rapidly evolving ecosystem of immersive sound, from festivals and clubs to listening spaces, experiential installations, new technologies and entirely new ways of experiencing music.",
 "/panels/cineuro-film-lab-unlocking-opportunities-across-europecs-film-creative-industries-panel-kikk2026":"This panel highlights the cross-border cooperation opportunities offered by the CinEuro Film Lab to professionals in the film, audiovisual and creative industries. Through concrete initiatives, discover how synergies between regions foster co-production, innovation and the development of projects that showcase unique stories rooted in local territories and their cultural specificities.",
@@ -537,7 +546,21 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const check = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
 const plus = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>';
 
-$("snap").textContent = SNAPSHOT.replace(/^2026-10-(\d+)/, "$1 Oct");
+const snapLabel = s => s.replace(/^\d{4}-10-(\d+) /, "$1 Oct, ");
+$("snap").textContent = snapLabel(SNAPSHOT);
+
+// Poll version.json (published with each refresh): show the newer "Updated" time, and a reload link if the schedule changed
+async function checkVersion(){
+  try {
+    const v = await (await fetch("version.json?t=" + Date.now(), {cache:"no-store"})).json();
+    if (v.snapshot && v.snapshot > SNAPSHOT) $("snap").textContent = snapLabel(v.snapshot);
+    if (v.hash && v.hash !== DATA_HASH) $("fresh").hidden = false;
+  } catch (_) {}
+}
+$("reload").onclick = ev => { ev.preventDefault(); location.reload(); };
+checkVersion();
+setInterval(checkVersion, 5 * 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkVersion(); });
 $("legend").innerHTML = Object.values(VENUES).map(v => `<span><i style="background:var(${v.c})"></i>${v.name}</span>`).join("");
 $("daynav").innerHTML = DAYS.map(d => `<button data-day="${d.id}"><span>${d.dow.toUpperCase()}</span><b>${d.n}</b></button>`).join("");
 $("daynav").addEventListener("click", e => { const b = e.target.closest("button"); if (b) document.getElementById("d-"+b.dataset.day)?.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth"}); });
