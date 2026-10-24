@@ -204,7 +204,7 @@ footer a{color:inherit}
   <div class="hero">
     <h1>KIKK<br>agenda</h1>
     <div class="where">Namur, 22–24 October 2026</div>
-    <div class="sync">Updated <span id="snap"></span><span id="fresh" class="fresh" hidden> · <a href="" id="reload">Updates available, refresh now</a></span></div>
+    <div class="sync">Updated <span id="snap"></span><span id="fresh" class="fresh" hidden> · <a href="" id="reload">One last update, click here!</a></span></div>
   </div>
   <header id="hdr">
     <div class="controls">
@@ -230,7 +230,7 @@ footer a{color:inherit}
   </section>
   <footer>Schedule subject to change on kikkfestival.be. Your picks are saved in this browser only. Saturday currently lists one evening concert; talks run Thursday and Friday.</footer>
 </div>
-<div class="farewell" id="farewell" role="dialog" aria-modal="true" aria-labelledby="farewell-t">
+<div class="farewell" id="farewell" hidden role="dialog" aria-modal="true" aria-labelledby="farewell-t">
   <button class="close" id="farewellClose" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg></button>
   <div>
     <p class="bye" id="farewell-t" lang="fr">Je t'aime moNamur</p>
@@ -252,7 +252,7 @@ footer a{color:inherit}
 <script>
 // Written by scripts/refresh.mjs on every scheduled refresh (Brussels time) together with version.json
 const SNAPSHOT = "2026-10-24 07:01";
-const DATA_HASH = "610d645d2963";
+const DATA_HASH = "farewell-1";
 const VENUES = {
   bourse:{name:"La Bourse", c:"--bourse"},
   theatre:{name:"Théâtre de Namur", c:"--theatre"},
@@ -810,10 +810,11 @@ function closeIntro(){
   syncLock();
   try { document.cookie = "kikk_intro=1; max-age=31536000; path=/; SameSite=Lax"; } catch(_) {}
 }
-// The festival is over: open with the farewell (every visit); closing it shows the app as usual
+// The festival is over: show the farewell once per visitor; the sign-off at the end of the page stays
 function closeFarewell(){ $("farewell").hidden = true; syncLock(); }
+if (!store.get("kikk.farewellSeen", false)) { $("farewell").hidden = false; store.set("kikk.farewellSeen", true); }
 $("farewellClose").onclick = closeFarewell;
-syncLock(); $("farewellClose").focus();
+syncLock(); if (!$("farewell").hidden) $("farewellClose").focus();
 $("intro-go").onclick = closeIntro;
 
 document.addEventListener("keydown", e => { if (e.key==="Escape") { if (!$("farewell").hidden) closeFarewell(); else if (!$("intro").hidden) closeIntro(); else if ($("modalScrim")) closeModal(); else closeSheet(); } if ((e.key==="Enter"||e.key===" ") && e.target.classList?.contains("card")) { e.preventDefault(); openSheet(e.target.dataset.id); } });
