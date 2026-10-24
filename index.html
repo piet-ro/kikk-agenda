@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-title" content="KIKK agenda">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@1,700&display=swap">
 <style>
 /* Layout: KIKK-bingo look. Black ground, white type and hairline grid; venue colour only as accent. One scroll of three days. */
 :root{
@@ -168,6 +168,21 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var
 .intro .go:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .intro small{font-size:10.5px;line-height:1.35;color:#8a8a8a;text-align:center}
 
+/* Farewell: full-screen message after the festival, plus a quiet copy at the end of the page */
+.farewell{position:fixed;inset:0;z-index:40;background:#000;color:#fff;display:grid;place-items:center;text-align:center;
+  padding:calc(64px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-left,0px)) calc(40px + env(safe-area-inset-bottom,0px));overflow:auto}
+.farewell .close{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;border:0;padding:0;
+  background:rgba(255,255,255,.14);color:#fff;display:grid;place-items:center;cursor:pointer}
+.farewell .close svg{width:16px;height:16px}
+.farewell .close:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.bye{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-weight:700;font-style:italic;letter-spacing:-.01em;line-height:.9;margin:0;text-wrap:balance}
+.farewell .bye{font-size:clamp(64px,17vw,190px)}
+.bye-sub{font-family:var(--display);font-size:15px;line-height:1.3;margin:22px 0 0}
+.farewell .bye-sub{color:#fff}
+.bye-end{text-align:center;padding:56px 0 8px;color:var(--ink)}
+.bye-end .bye{font-size:clamp(40px,11vw,64px)}
+.bye-end .bye-sub{margin-top:12px}
+
 /* Desktop: full width, all days side by side, no day tabs */
 @media (min-width:1024px){
   .wrap{max-width:none}
@@ -209,7 +224,18 @@ footer a{color:inherit}
     <div class="legend" id="legend"></div>
   </header>
   <main id="main"></main>
+  <section class="bye-end" aria-label="Goodbye">
+    <p class="bye" lang="fr">Je t'aime moNamur</p>
+    <p class="bye-sub">It was fun! But time to go home.</p>
+  </section>
   <footer>Schedule subject to change on kikkfestival.be. Your picks are saved in this browser only. Saturday currently lists one evening concert; talks run Thursday and Friday.</footer>
+</div>
+<div class="farewell" id="farewell" role="dialog" aria-modal="true" aria-labelledby="farewell-t">
+  <button class="close" id="farewellClose" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg></button>
+  <div>
+    <p class="bye" id="farewell-t" lang="fr">Je t'aime moNamur</p>
+    <p class="bye-sub">It was fun! But time to go home.</p>
+  </div>
 </div>
 <div id="sheetRoot"></div>
 <div id="modalRoot"></div>
@@ -747,7 +773,7 @@ $("addEvent").onclick = openAddModal;
 
 // Keep the page behind the intro or an open sheet from scrolling
 function syncLock(){
-  const on = !$("intro").hidden || !!$("sheet") || !!$("modalScrim");
+  const on = !$("farewell").hidden || !$("intro").hidden || !!$("sheet") || !!$("modalScrim");
   document.documentElement.style.overflow = on ? "hidden" : "";
 }
 
@@ -784,10 +810,13 @@ function closeIntro(){
   syncLock();
   try { document.cookie = "kikk_intro=1; max-age=31536000; path=/; SameSite=Lax"; } catch(_) {}
 }
-if (!introSeen()) { $("intro").hidden = false; syncLock(); $("intro-go").focus(); }
+// The festival is over: open with the farewell (every visit); closing it shows the app as usual
+function closeFarewell(){ $("farewell").hidden = true; syncLock(); }
+$("farewellClose").onclick = closeFarewell;
+syncLock(); $("farewellClose").focus();
 $("intro-go").onclick = closeIntro;
 
-document.addEventListener("keydown", e => { if (e.key==="Escape") { if (!$("intro").hidden) closeIntro(); else if ($("modalScrim")) closeModal(); else closeSheet(); } if ((e.key==="Enter"||e.key===" ") && e.target.classList?.contains("card")) { e.preventDefault(); openSheet(e.target.dataset.id); } });
+document.addEventListener("keydown", e => { if (e.key==="Escape") { if (!$("farewell").hidden) closeFarewell(); else if (!$("intro").hidden) closeIntro(); else if ($("modalScrim")) closeModal(); else closeSheet(); } if ((e.key==="Enter"||e.key===" ") && e.target.classList?.contains("card")) { e.preventDefault(); openSheet(e.target.dataset.id); } });
 
 $("main").addEventListener("click", ev => {
   const p = ev.target.closest("[data-pick]"); if (p){ ev.stopPropagation(); togglePick(p.dataset.pick); return; }
